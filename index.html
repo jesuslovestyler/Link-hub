@@ -561,6 +561,7 @@
 
       <footer>
         <span>47 destinations</span>
+        <span id="visit-count" hidden><span id="visit-count-num"></span> visits</span>
         <span>Last checked October 15, 2026</span>
       </footer>
     </main>
@@ -626,6 +627,45 @@
           /* Service worker registration failed; the page works without it. */
         }
       }
+    </script>
+    <script data-goatcounter="https://jesuslovestyler.goatcounter.com/count"
+        async src="//gc.zgo.at/count.js"></script>
+    <script>
+      (function () {
+        var wrap = document.getElementById('visit-count');
+        var num = document.getElementById('visit-count-num');
+        var tries = 0;
+        var timer = setInterval(function () {
+          tries += 1;
+          if (window.goatcounter && typeof window.goatcounter.visit_count === 'function') {
+            clearInterval(timer);
+            try {
+              window.goatcounter.visit_count({ append: '#visit-count-num', no_branding: false });
+            } catch (err) {
+              return; /* Count unavailable; the counter stays hidden. */
+            }
+            var checks = 0;
+            var reveal = setInterval(function () {
+              checks += 1;
+              if (num.textContent.trim() !== '') {
+                wrap.hidden = false;
+                clearInterval(reveal);
+              } else if (checks > 40) {
+                clearInterval(reveal); /* Count never arrived; stay hidden. */
+              }
+            }, 250);
+          } else if (tries > 40) {
+            clearInterval(timer); /* GoatCounter never loaded; stay hidden. */
+          }
+        }, 250);
+      })();
+    </script>
+    <script>
+      window.addEventListener('appinstalled', function () {
+        if (window.goatcounter && typeof window.goatcounter.count === 'function') {
+          window.goatcounter.count({ path: 'app-installed', event: true });
+        }
+      });
     </script>
   </body>
 </html>
