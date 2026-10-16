@@ -634,30 +634,69 @@
       (function () {
         var wrap = document.getElementById('visit-count');
         var num = document.getElementById('visit-count-num');
-        var tries = 0;
-        var timer = setInterval(function () {
-          tries += 1;
-          if (window.goatcounter && typeof window.goatcounter.visit_count === 'function') {
-            clearInterval(timer);
-            try {
-              window.goatcounter.visit_count({ append: '#visit-count-num', no_branding: false });
-            } catch (err) {
-              return; /* Count unavailable; the counter stays hidden. */
-            }
-            var checks = 0;
-            var reveal = setInterval(function () {
-              checks += 1;
-              if (num.textContent.trim() !== '') {
-                wrap.hidden = false;
-                clearInterval(reveal);
-              } else if (checks > 40) {
-                clearInterval(reveal); /* Count never arrived; stay hidden. */
+
+        function show(count) {
+          num.textContent = String(count);
+          wrap.hidden = false;
+        }
+
+        /* Fallback: the goatcounter.visit_count integration. Unhide only
+           once the count text has actually been written into the element. */
+        function fallback() {
+          var tries = 0;
+          var timer = setInterval(function () {
+            tries += 1;
+            if (window.goatcounter && typeof window.goatcounter.visit_count === 'function') {
+              clearInterval(timer);
+              try {
+                window.goatcounter.visit_count({ append: '#visit-count-num', no_branding: false });
+              } catch (err) {
+                return; /* Count unavailable; the counter stays hidden. */
               }
-            }, 250);
-          } else if (tries > 40) {
-            clearInterval(timer); /* GoatCounter never loaded; stay hidden. */
-          }
-        }, 250);
+              var checks = 0;
+              var reveal = setInterval(function () {
+                checks += 1;
+                if (num.textContent.trim() !== '') {
+                  wrap.hidden = false;
+                  clearInterval(reveal);
+                } else if (checks > 40) {
+                  clearInterval(reveal); /* Count never arrived; stay hidden. */
+                }
+              }, 250);
+            } else if (tries > 40) {
+              clearInterval(timer); /* GoatCounter never loaded; stay hidden. */
+            }
+          }, 250);
+        }
+
+        /* Primary: GoatCounter's public counter JSON for the home page
+           (path '/' URL-encoded as %2F). */
+        var done = false;
+        if (window.fetch) {
+          fetch('https://jesuslovestyler.goatcounter.com/counter/%2F.json')
+            .then(function (res) {
+              if (!res.ok) throw new Error('Counter request failed');
+              return res.json();
+            })
+            .then(function (data) {
+              var count = data ? data.count : null;
+              if (count !== null && count !== undefined && String(count).trim() !== '') {
+                done = true;
+                show(String(count).trim());
+              } else if (!done) {
+                done = true;
+                fallback();
+              }
+            })
+            .catch(function () {
+              if (!done) {
+                done = true;
+                fallback();
+              }
+            });
+        } else {
+          fallback();
+        }
       })();
     </script>
     <script>
