@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>One moment… — Jesus Loves Tyler</title>
+<meta name="robots" content="noindex">
+<script>
+(function () {
+  // jesuslovestyler.com is the hub. Every other page lives at
+  // jesuslovestyler.github.io/<RepoName>/. GitHub Pages serves this file
+  // for any jesuslovestyler.com address that has no file of its own, so
+  // it forwards pretty links like jesuslovestyler.com/psalm-23 to the
+  // matching page. GitHub paths are case-sensitive, so names are matched
+  // case-insensitively here and the exact repo casing is restored.
+  var PAGES = {
+    "gospel-presentation": "Gospel-presentation",
+    "first-steps": "First-steps",
+    "invitations-of-jesus": "Invitations-of-Jesus",
+    "bible-reading-plan": "Bible-reading-plan",
+    "proverb-of-the-day": "Proverb-of-the-day",
+    "fruit-of-the-spirit": "Fruit-of-the-spirit",
+    "assurance": "Assurance",
+    "armor-of-god": "Armor-of-God",
+    "beatitudes": "Beatitudes",
+    "comfort-verses": "Comfort-verses",
+    "he-is-risen": "He-is-risen",
+    "heaven": "Heaven",
+    "jesus-loves-children": "Jesus-loves-children",
+    "names-of-jesus": "Names-of-Jesus",
+    "i-am-sayings": "I-am-sayings",
+    "psalm-23": "Psalm-23",
+    "psalm-91": "Psalm-91",
+    "for-the-grieving": "For-the-grieving",
+    "for-the-lonely": "For-the-lonely",
+    "come-home": "Come-home",
+    "for-the-sick": "For-the-sick",
+    "for-the-anxious": "For-the-anxious",
+    "lords-prayer": "Lords-prayer",
+    "love-chapter": "Love-chapter",
+    "romans-8": "Romans-8",
+    "weary-caregiver": "Weary-caregiver",
+    "for-those-who-wait": "For-those-who-wait",
+    "about": "About",
+    "world-english-bible": "World-English-Bible",
+    "web-concordance": "WEB-concordance",
+    "calculator": "Calculator",
+    "domain-checker": "Domain-checker",
+    "qr-code-generator": "QR-code-generator",
+    "unit-converter": "Unit-converter",
+    "verse-image-maker": "Verse-image-maker",
+    "verses-for-the-moment": "Verses-for-the-moment",
+    "random-verse-generator": "Random-verse-generator",
+    "color-mixer": "Color-mixer",
+    "artifact-engineering-manifesto": "Artifact-engineering-manifesto",
+    "breathing-pacer": "Breathing-pacer",
+    "clock-artifact": "Clock-artifact",
+    "dice-roller": "Dice-roller",
+    "white-noise-artifact": "White-noise-artifact",
+    "tip-and-split-calculator": "Tip-and-split-calculator",
+    "word-counter": "Word-counter",
+    "day-counter": "Day-counter",
+    "best-deal-calculator": "Best-deal-calculator",
+    "percentage-calculator": "Percentage-calculator",
+    "stopwatch-and-timer": "Stopwatch-and-timer",
+    "around-the-world": "Around-the-world",
+    "block-crasher": "Block-crasher",
+    "bluegill-pond": "Bluegill-pond",
+    "brick-breaker": "Brick-breaker",
+    "fruit-hopper": "Fruit-hopper",
+    "fruit-invaders": "Fruit-invaders",
+    "garden-guard": "Garden-guard",
+    "mahjong": "Mahjong",
+    "meteor-breaker": "Meteor-breaker",
+    "minesweeper": "Minesweeper",
+    "paddle-duel": "Paddle-duel",
+    "penalty-shootout": "Penalty-shootout",
+    "snack-maze": "Snack-maze",
+    "snake": "Snake",
+    "solitaire": "Solitaire",
+    "sudoku": "Sudoku",
+    "touchdown-run": "Touchdown-run",
+    "tunnel-trouble": "Tunnel-trouble",
+    "virtual-batting-cage": "Virtual-batting-cage"
+  };
+  var parts = window.location.pathname.split("/").filter(function (s) { return s.length > 0; });
+  if (parts.length === 0) {
+    window.location.replace("https://jesuslovestyler.com/");
+    return;
+  }
+  var repo = PAGES[parts[0].toLowerCase()] || parts[0];
+  var rest = parts.slice(1).join("/");
+  var target = "https://jesuslovestyler.github.io/" + repo + "/" + rest +
+    window.location.search + window.location.hash;
+  window.location.replace(target);
+})();
+</script>
+<style>
+  body { margin: 0; min-height: 100vh; display: flex; align-items: center; justify-content: center;
+    background: #171310; color: #f3e9d8; font-family: Georgia, 'Times New Roman', serif; text-align: center; }
+  main { padding: 2rem; }
+  a { color: #e8b34b; }
+</style>
+</head>
+<body>
+<main>
+  <p>One moment — taking you to the page…</p>
+  <p>If nothing happens, <a href="https://jesuslovestyler.com/">go to the homepage</a> and pick it from there.</p>
+</main>
+</body>
+</html>
