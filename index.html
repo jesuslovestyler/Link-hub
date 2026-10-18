@@ -4,6 +4,8 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <meta name="color-scheme" content="light dark" />
+    <!-- Build stamp for the footer's "Check for updates" button: change this value on every rebuild of this page. -->
+    <meta name="build-stamp" content="hub-2026-10-17-2332" />
     <meta name="description" content="Read the whole Bible free online (World English Bible, Jesus's words in red), plus devotionals, everyday tools, and simple games — all free, all public domain." />
     <meta property="og:type" content="website" />
     <meta property="og:url" content="https://jesuslovestyler.com/" />
@@ -169,7 +171,7 @@
         margin-top: 22px;
       }
 
-      .share-btn, .about-btn {
+      .share-btn, .about-btn, .update-btn {
         display: inline-flex;
         align-items: center;
         gap: 8px;
@@ -186,9 +188,13 @@
 
       .about-btn { text-decoration: none; }
 
-      .share-btn:hover, .about-btn:hover { background: var(--surface-hover); }
+      .share-btn:hover, .about-btn:hover, .update-btn:hover { background: var(--surface-hover); }
 
-      .share-btn svg, .about-btn svg { width: 16px; height: 16px; flex: none; }
+      .share-btn svg, .about-btn svg, .update-btn svg { width: 16px; height: 16px; flex: none; }
+
+      .update-btn:disabled { opacity: 0.6; cursor: default; }
+
+      .update-btn:disabled:hover { background: var(--accent-soft); }
 
       .share-status {
         color: var(--accent-ink);
@@ -199,9 +205,19 @@
 
       .share-status.visible { opacity: 1; }
 
+      .update-status {
+        color: var(--accent-ink);
+        font-size: 0.85rem;
+        opacity: 0;
+        transition: opacity 200ms ease;
+      }
+
+      .update-status.visible { opacity: 1; }
+
       .footer-actions {
         display: flex;
         align-items: center;
+        flex-wrap: wrap;
         gap: 16px;
       }
 
@@ -734,6 +750,8 @@
         <span>Last checked October 17, 2026</span>
         <span class="footer-actions">
           <a class="footer-link" href="https://jesuslovestyler.github.io/About/">About this site</a>
+          <button class="update-btn" id="update-check" type="button"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 4v6h-6"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>Check for updates</button>
+          <span class="update-status" id="update-status" role="status" aria-live="polite"></span>
           <button class="share-btn" type="button"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15V4"/><path d="m7 8 5-5 5 5"/><path d="M5 13v6a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-6"/></svg>Share this site</button>
           <span class="share-status" role="status" aria-live="polite"></span>
         </span>
@@ -938,6 +956,89 @@
           window.goatcounter.count({ path: 'app-installed', event: true });
         }
       });
+    </script>
+    <script>
+      /* "Check for updates": fetch this page's own address from the network,
+         bypassing caches, and compare the build stamp it returns with the
+         stamp of the page now running. If they differ, reload once with a
+         cache-busting address; the "updated" flag in that address makes the
+         fresh page show its confirmation note. Any failure only reports
+         itself — the page and its offline behavior are never touched. */
+      (function () {
+        var meta = document.querySelector('meta[name="build-stamp"]');
+        var CURRENT = meta ? meta.getAttribute('content') : '';
+        var btn = document.getElementById('update-check');
+        var status = document.getElementById('update-status');
+        if (!btn || !status) return;
+
+        function say(message) {
+          status.textContent = message;
+          status.classList.add('visible');
+        }
+
+        function pageBase() {
+          return window.location.href.split('#')[0].split('?')[0];
+        }
+
+        /* Arriving from an update reload: show the note, then tidy the
+           address so a later manual refresh stays clean. */
+        if (/[?&]updated=1(?:&|$)/.test(window.location.search)) {
+          say('Updated to the latest version.');
+          try {
+            window.history.replaceState(null, '', window.location.pathname + window.location.hash);
+          } catch (err) { /* Address stays as-is; harmless. */ }
+        }
+
+        function stampFrom(html) {
+          var tag = html.match(/<meta[^>]*name=["']build-stamp["'][^>]*>/i) ||
+                    html.match(/<meta[^>]*build-stamp[^>]*>/i);
+          if (!tag) return null;
+          var content = tag[0].match(/content=["']([^"']+)["']/i);
+          return content ? content[1] : null;
+        }
+
+        btn.addEventListener('click', function () {
+          if (btn.disabled) return;
+          if (!window.fetch) {
+            say('No connection right now — please try again later.');
+            return;
+          }
+          btn.disabled = true;
+          say('Checking…');
+
+          var controller = ('AbortController' in window) ? new AbortController() : null;
+          var timer = null;
+          if (controller) {
+            timer = setTimeout(function () { controller.abort(); }, 12000);
+          }
+          var options = { cache: 'no-store', credentials: 'same-origin' };
+          if (controller) options.signal = controller.signal;
+
+          fetch(pageBase() + '?update-check=' + Date.now(), options)
+            .then(function (res) {
+              if (!res.ok) throw new Error('Update check failed');
+              return res.text();
+            })
+            .then(function (html) {
+              if (timer) clearTimeout(timer);
+              var fresh = stampFrom(html);
+              if (fresh && CURRENT && fresh !== CURRENT) {
+                say('Update found — refreshing…');
+                setTimeout(function () {
+                  window.location.replace(pageBase() + '?updated=1&fresh=' + Date.now());
+                }, 600);
+              } else {
+                btn.disabled = false;
+                say("You're up to date.");
+              }
+            })
+            .catch(function () {
+              if (timer) clearTimeout(timer);
+              btn.disabled = false;
+              say('No connection right now — please try again later.');
+            });
+        });
+      })();
     </script>
   </body>
 </html>
